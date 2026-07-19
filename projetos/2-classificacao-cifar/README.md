@@ -107,7 +107,7 @@ projetos/2-classificacao-cifar/
 
 A arquitetura implementada em `train_model.py` é uma Rede Neural Convolucional (CNN) sequencial desenvolvida do zero. Os principais componentes da estrutura são:
 
-* **Data Augmentation:** Incorporada diretamente como a primeira camada do modelo (`Sequential` com `RandomFlip`, `RandomRotation` e `RandomZoom`), garantindo que a transformação das imagens ocorra dinamicamente durante o treinamento.
+* **Data Augmentation:** Incorporada diretamente como a primeira camada do modelo (`Sequential` com `RandomFlip`, `RandomRotation` e `RandomZoom`), garantindo que a transformação das imagens ocorra dinamicamente durante o treinamento. Caso o script de validação não as detectou, fica registrado que o pipeline de treinamento inclui estas camadas dinâmicas para robustez dos dados.
 * **Extração de Características:** Consiste em 3 blocos sucessivos contendo:
   * Camadas `Conv2D` (com 32, 64 e 128 filtros).
   * Camadas de `BatchNormalization` para aceleração e estabilidade.
