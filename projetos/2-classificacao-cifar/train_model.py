@@ -80,7 +80,7 @@ early_stopping = callbacks.EarlyStopping(
 print("\nIniciando o treinamento na CPU...")
 history = model.fit(
     x_train, y_train,
-    epochs=25, 
+    epochs=1, 
     batch_size=64, 
     validation_data=(x_val, y_val),
     callbacks=[early_stopping]
