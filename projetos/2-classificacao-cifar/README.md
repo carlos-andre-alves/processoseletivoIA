@@ -141,7 +141,7 @@ Essa técnica aplica a **Quantização de Faixa Dinâmica** (*Dynamic Range Quan
 | **Acurácia de Validação** | `0.7413` (74.13%) |
 | **Tamanho Original** (`model.h5`) | 4.17 MB |
 | **Tamanho Otimizado** (`model.tflite`) | 0.35 MB |
-| **Taxa de Redução** | **91.5%** 🚀 |
+| **Taxa de Redução** | **91.5%**  |
 
 ---
 
@@ -164,6 +164,7 @@ Amostra 2: predito=ship | real=ship
 Amostra 3: predito=ship | real=ship
 Amostra 4: predito=ship | real=airplane
 Amostra 5: predito=frog | real=frog
+```
 
 O modelo acertou 4 das 5 amostras (80%), um resultado excelente e alinhado com a acurácia de validação (74.13%). O único erro ocorreu na Amostra 4, onde o modelo confundiu um avião com um navio. Esse é um falso-positivo clássico no dataset CIFAR-10: ambas as classes frequentemente apresentam corpos alongados cinzas/metálicos inseridos em um grande fundo azul (céu versus oceano). Na baixa resolução de 32x32 pixels, as texturas se perdem e a rede neural acaba se apoiando muito na cor de fundo (azul) para tomar a decisão, gerando essa confusão.
 
