@@ -122,7 +122,7 @@ Clique no link do projeto escolhido para ver as instruções técnicas completas
 Dentro da pasta do seu projeto, execute os scripts e confirme que os arquivos foram gerados:
 
 ```bash
-cd projetos/<pasta-do-projeto-escolhido>
+cd projetos/2-classificacao-cifar>
 python train_model.py       # deve gerar model.h5 (Projetos 1 e 2) ou model.pt (Projeto 3)
 python optimize_model.py    # deve gerar model.tflite
 ```
