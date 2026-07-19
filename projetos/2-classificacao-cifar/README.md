@@ -1,5 +1,10 @@
 # Projeto 2 — Classificação CIFAR-10
 
+### 👨‍💻 Identificação do Candidato
+* **Nome:** Carlos André
+* **Instituição:** Universidade Federal do Vale do São Francisco (UNIVASF)
+* **Curso:** Engenharia de Computação
+
 ## 💻 O Desafio Técnico
 
 Desenvolva um **modelo de Visão Computacional** capaz de **classificar imagens coloridas** em 10 categorias de objetos e animais (avião, automóvel, pássaro, gato, cervo, cachorro, sapo, cavalo, navio, caminhão), e posteriormente **otimize-o para execução em dispositivos Edge**.
@@ -100,43 +105,64 @@ projetos/2-classificacao-cifar/
 
 ### 1️⃣ Resumo da Arquitetura do Modelo
 
-A arquitetura implementada em train_model.py é uma Rede Neural Convolucional (CNN) sequencial desenvolvida do zero. A estratégia de Data Augmentation foi incorporada diretamente como a primeira camada do modelo (Sequential com RandomFlip, RandomRotation e RandomZoom), garantindo que a transformação ocorra dinamicamente durante o treinamento. A extração de características consiste em 3 blocos sucessivos contendo Conv2D (com 32, 64 e 128 filtros), seguidos por BatchNormalization para aceleração e estabilidade, e MaxPooling2D. A camada de classificação utiliza Flatten, uma densa de 128 neurônios, seguida por um Dropout(0.5) para mitigação de overfitting, finalizando com uma saída Softmax para as 10 classes.
+A arquitetura implementada em `train_model.py` é uma Rede Neural Convolucional (CNN) sequencial desenvolvida do zero. Os principais componentes da estrutura são:
+
+* **Data Augmentation:** Incorporada diretamente como a primeira camada do modelo (`Sequential` com `RandomFlip`, `RandomRotation` e `RandomZoom`), garantindo que a transformação das imagens ocorra dinamicamente durante o treinamento.
+* **Extração de Características:** Consiste em 3 blocos sucessivos contendo:
+  * Camadas `Conv2D` (com 32, 64 e 128 filtros).
+  * Camadas de `BatchNormalization` para aceleração e estabilidade.
+  * Camadas de `MaxPooling2D` para redução de dimensionalidade.
+* **Classificação:** Utiliza `Flatten`, uma camada densa de 128 neurônios, seguida por um `Dropout(0.5)` para mitigação de *overfitting*, finalizando com uma saída `Softmax` para as 10 classes do CIFAR-10.
+
+---
 
 ### 2️⃣ Bibliotecas Utilizadas
 
-Python: 3.11 (Ambiente nativo do GitHub Codespaces).
+* **Python (3.11):** Ambiente nativo do GitHub Codespaces.
+* **TensorFlow / Keras (2.15.0):** Motor principal responsável pela construção da CNN, aplicação do Data Augmentation, treinamento e conversão via `TFLiteConverter`.
+* **Scikit-Learn (1.4.2):** Utilizada especificamente pela função `train_test_split` para garantir a divisão correta e determinística das bases de treino e validação.
+* **NumPy (1.26.4):** Essencial para a manipulação matemática de arrays e expansão de dimensões (`np.expand_dims`) durante o pipeline de inferência.
 
-TensorFlow / Keras: 2.15.0 (Motor principal responsável pela construção da CNN, aplicação do Data Augmentation, treinamento e conversão via TFLiteConverter).
-
-Scikit-Learn: 1.4.2 (Utilizada especificamente pela função train_test_split para garantir a divisão correta e determinística das bases de treino e validação).
-
-NumPy: 1.26.4 (Essencial para a manipulação matemática de arrays e expansão de dimensões np.expand_dims durante o pipeline de inferência).
+---
 
 ### 3️⃣ Técnica de Otimização do Modelo
 
-No script optimize_model.py, a otimização foi realizada utilizando o TFLiteConverter com a flag converter.optimizations = [tf.lite.Optimize.DEFAULT]. Essa técnica aplica a Quantização de Faixa Dinâmica (Dynamic Range Quantization). Ela converte os pesos da rede neural de ponto flutuante de 32 bits (Float32) para inteiros de 8 bits (Int8), reduzindo drasticamente o consumo de memória e o tempo de inferência em dispositivos Edge, mantendo as ativações em ponto flutuante durante a execução para preservar a acurácia.
+No script `optimize_model.py`, a otimização foi realizada utilizando o `TFLiteConverter` com a seguinte flag ativada:
+`converter.optimizations = [tf.lite.Optimize.DEFAULT]`
+
+Essa técnica aplica a **Quantização de Faixa Dinâmica** (*Dynamic Range Quantization*). Ela converte os pesos da rede neural de ponto flutuante de 32 bits (Float32) para inteiros de 8 bits (Int8). Isso reduz drasticamente o consumo de memória e o tempo de inferência em dispositivos Edge, mantendo as ativações em ponto flutuante durante a execução para preservar a acurácia da rede.
+
+---
 
 ### 4️⃣ Resultados Obtidos
 
-Acurácia de Validação: 0.7611 (76.11%)
+| **Acurácia de Validação** | `0.7413` (74.13%) |
+| **Tamanho Original** (`model.h5`) | 4.17 MB |
+| **Tamanho Otimizado** (`model.tflite`) | 0.35 MB |
+| **Taxa de Redução** | **91.5%** 🚀 |
 
-Tamanho do modelo original (`model.h5`): 4.16 MB
-Tamanho do modelo otimizado (`model.tflite`): 0.36 MB
-Redução de tamanho: 91.4%
+---
 
-### 5️⃣ Comentários Adicionais (Opcional)
+### 5️⃣ Comentários Adicionais
 
-Como o treinamento foi restrito ao uso de CPU no ambiente virtual, a principal decisão técnica envolveu o gerenciamento de recursos. O batch_size foi fixado em 64 para evitar gargalos de alocação de RAM (indicados nos logs iniciais). O uso do EarlyStopping provou-se altamente eficaz: no treinamento final, o modelo convergiu excelentemente, e o callback interrompeu o processo e restaurou os pesos ideais da Época 22 (val_loss: 0.7171), garantindo uma generalização robusta e evitando desperdício computacional. A quantização final obteve uma redução de mais de 90% no peso do modelo, provando a viabilidade do deploy em microcontroladores.
+Como o treinamento foi restrito ao uso de CPU no ambiente virtual, a principal decisão técnica envolveu o gerenciamento de recursos:
+* O **`batch_size`** foi fixado em 64 para evitar gargalos de alocação de RAM (indicados nos logs iniciais).
+* * O **`EarlyStopping`** foi configurado para monitorar a `val_loss`, garantindo que o modelo retivesse os melhores pesos alcançados durante o treinamento. A rede demonstrou uma convergência consistente ao longo das 25 épocas, atingindo sua acurácia máxima de 74.13% na época final, demonstrando uma generalização robusta e um aprendizado estável sem sinais de *overfitting* agressivo.
+* A **quantização final** obteve uma redução de mais de 90% no peso do modelo, provando a viabilidade do *deploy* em microcontroladores.
+
+---
 
 ### 6️⃣ Exemplo de Inferência
 
-Rodando inferência em 5 amostras usando model.tflite:
+A inferência foi realizada com sucesso em 5 amostras do conjunto de testes utilizando o modelo leve (`model.tflite`). Segue a saída gerada no terminal:
+
 
 Amostra 1: predito=cat | real=cat
 Amostra 2: predito=ship | real=ship
 Amostra 3: predito=ship | real=ship
-Amostra 4: predito=airplane | real=airplane
+Amostra 4: predito=ship | real=airplane
 Amostra 5: predito=frog | real=frog
 
+O modelo acertou 4 das 5 amostras (80%), um resultado excelente e alinhado com a acurácia de validação (74.13%). O único erro ocorreu na Amostra 4, onde o modelo confundiu um avião com um navio. Esse é um falso-positivo clássico no dataset CIFAR-10: ambas as classes frequentemente apresentam corpos alongados cinzas/metálicos inseridos em um grande fundo azul (céu versus oceano). Na baixa resolução de 32x32 pixels, as texturas se perdem e a rede neural acaba se apoiando muito na cor de fundo (azul) para tomar a decisão, gerando essa confusão.
 
-modelo otimizado (TFLite) conseguiu classificar corretamente todas as 5 amostras aleatórias testadas da base de teste. Esse resultado prático valida o sucesso da quantização (redução para 360 KB), que não degradou de forma perceptível a capacidade de generalização visual da rede, mantendo a consistência com a acurácia de ~76% obtida na etapa de validação.
+Esse resultado prático valida o sucesso da quantização (redução para 350 KB), que não degradou de forma perceptível a capacidade de generalização visual da rede, mantendo a consistência com a acurácia de ~74% obtida na etapa de validação.

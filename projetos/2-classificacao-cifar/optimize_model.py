@@ -35,7 +35,7 @@ print("=========================================\n")
 tamanho_h5 = os.path.getsize('model.h5') / (1024 * 1024)
 tamanho_tflite = os.path.getsize('model.tflite') / (1024 * 1024)
 
-print(" DADOS FINAIS:")
+print(" DADOS PARA COMPARAÇÃO:")
 print(f"Tamanho Original (model.h5):     {tamanho_h5:.2f} MB")
 print(f"Tamanho Otimizado (model.tflite): {tamanho_tflite:.2f} MB")
 print(f"Redução de tamanho:              {(1 - (tamanho_tflite / tamanho_h5)) * 100:.1f}%")
