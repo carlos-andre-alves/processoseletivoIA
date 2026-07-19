@@ -96,28 +96,47 @@ projetos/2-classificacao-cifar/
 
 ## 📝 Relatório do Candidato
 
-👤 **Nome Completo:**
+👤 **Nome Completo: Carlos André Alves Torres Filho**
 
 ### 1️⃣ Resumo da Arquitetura do Modelo
 
-Descreva a arquitetura da CNN implementada em `train_model.py` e a estratégia de data augmentation utilizada.
+A arquitetura implementada em train_model.py é uma Rede Neural Convolucional (CNN) sequencial desenvolvida do zero. A estratégia de Data Augmentation foi incorporada diretamente como a primeira camada do modelo (Sequential com RandomFlip, RandomRotation e RandomZoom), garantindo que a transformação ocorra dinamicamente durante o treinamento. A extração de características consiste em 3 blocos sucessivos contendo Conv2D (com 32, 64 e 128 filtros), seguidos por BatchNormalization para aceleração e estabilidade, e MaxPooling2D. A camada de classificação utiliza Flatten, uma densa de 128 neurônios, seguida por um Dropout(0.5) para mitigação de overfitting, finalizando com uma saída Softmax para as 10 classes.
 
 ### 2️⃣ Bibliotecas Utilizadas
 
-Liste as principais bibliotecas utilizadas, preferencialmente com suas versões.
+Python: 3.11 (Ambiente nativo do GitHub Codespaces).
+
+TensorFlow / Keras: 2.15.0 (Motor principal responsável pela construção da CNN, aplicação do Data Augmentation, treinamento e conversão via TFLiteConverter).
+
+Scikit-Learn: 1.4.2 (Utilizada especificamente pela função train_test_split para garantir a divisão correta e determinística das bases de treino e validação).
+
+NumPy: 1.26.4 (Essencial para a manipulação matemática de arrays e expansão de dimensões np.expand_dims durante o pipeline de inferência).
 
 ### 3️⃣ Técnica de Otimização do Modelo
 
-Explique qual técnica foi utilizada para otimizar o modelo em `optimize_model.py`.
+No script optimize_model.py, a otimização foi realizada utilizando o TFLiteConverter com a flag converter.optimizations = [tf.lite.Optimize.DEFAULT]. Essa técnica aplica a Quantização de Faixa Dinâmica (Dynamic Range Quantization). Ela converte os pesos da rede neural de ponto flutuante de 32 bits (Float32) para inteiros de 8 bits (Int8), reduzindo drasticamente o consumo de memória e o tempo de inferência em dispositivos Edge, mantendo as ativações em ponto flutuante durante a execução para preservar a acurácia.
 
 ### 4️⃣ Resultados Obtidos
 
-Informe a acurácia de validação obtida e o tamanho dos arquivos `model.h5` e `model.tflite`.
+Acurácia de Validação: 0.7611 (76.11%)
+
+Tamanho do modelo original (`model.h5`): 4.16 MB
+Tamanho do modelo otimizado (`model.tflite`): 0.36 MB
+Redução de tamanho: 91.4%
 
 ### 5️⃣ Comentários Adicionais (Opcional)
 
-Dificuldades encontradas, decisões técnicas importantes, limitações do modelo, aprendizados durante o desafio.
+Como o treinamento foi restrito ao uso de CPU no ambiente virtual, a principal decisão técnica envolveu o gerenciamento de recursos. O batch_size foi fixado em 64 para evitar gargalos de alocação de RAM (indicados nos logs iniciais). O uso do EarlyStopping provou-se altamente eficaz: no treinamento final, o modelo convergiu excelentemente, e o callback interrompeu o processo e restaurou os pesos ideais da Época 22 (val_loss: 0.7171), garantindo uma generalização robusta e evitando desperdício computacional. A quantização final obteve uma redução de mais de 90% no peso do modelo, provando a viabilidade do deploy em microcontroladores.
 
 ### 6️⃣ Exemplo de Inferência
 
-Cole a saída do terminal ao rodar `run_inference.py` (predito vs. real para as 5+ amostras), e comente brevemente se houve algum caso interessante (acerto ou erro) entre as amostras testadas.
+Rodando inferência em 5 amostras usando model.tflite:
+
+Amostra 1: predito=cat | real=cat
+Amostra 2: predito=ship | real=ship
+Amostra 3: predito=ship | real=ship
+Amostra 4: predito=airplane | real=airplane
+Amostra 5: predito=frog | real=frog
+
+
+modelo otimizado (TFLite) conseguiu classificar corretamente todas as 5 amostras aleatórias testadas da base de teste. Esse resultado prático valida o sucesso da quantização (redução para 360 KB), que não degradou de forma perceptível a capacidade de generalização visual da rede, mantendo a consistência com a acurácia de ~76% obtida na etapa de validação.
