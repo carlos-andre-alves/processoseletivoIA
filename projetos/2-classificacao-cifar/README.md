@@ -136,6 +136,8 @@ Essa técnica aplica a **Quantização de Faixa Dinâmica** (*Dynamic Range Quan
 
 ### 4️⃣ Resultados Obtidos
 
+| Métrica / Arquivo | Resultado |
+| :--- | :--- |
 | **Acurácia de Validação** | `0.7413` (74.13%) |
 | **Tamanho Original** (`model.h5`) | 4.17 MB |
 | **Tamanho Otimizado** (`model.tflite`) | 0.35 MB |
@@ -156,7 +158,7 @@ Como o treinamento foi restrito ao uso de CPU no ambiente virtual, a principal d
 
 A inferência foi realizada com sucesso em 5 amostras do conjunto de testes utilizando o modelo leve (`model.tflite`). Segue a saída gerada no terminal:
 
-
+```text
 Amostra 1: predito=cat | real=cat
 Amostra 2: predito=ship | real=ship
 Amostra 3: predito=ship | real=ship
